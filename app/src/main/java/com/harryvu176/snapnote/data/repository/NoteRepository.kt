@@ -109,8 +109,8 @@ class NoteRepository(context: Context) {
                 id = obj.getString("id"),
                 title = obj.getString("title"),
                 content = obj.getString("content"),
-                imageUri = obj.optString("imageUri", ""),
-                folderId = obj.optString("folderId", ""),
+                imageUri = obj.optString("imageUri", null),
+                folderId = obj.optString("folderId", null),
                 createdAt = obj.getLong("createdAt"),
                 updatedAt = obj.getLong("updatedAt")
             ))
