@@ -2,7 +2,6 @@ package com.harryvu176.snapnote.ui.dialog
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.harryvu176.snapnote.databinding.DialogRenameFolderBinding

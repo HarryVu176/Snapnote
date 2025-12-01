@@ -1,18 +1,17 @@
 package com.harryvu176.snapnote.ui
 
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.harryvu176.snapnote.R
 import com.harryvu176.snapnote.databinding.ActivityNoteDetailBinding
 import com.harryvu176.snapnote.viewmodel.NoteDetailViewModel
-import androidx.core.net.toUri
 
 class NoteDetailActivity : AppCompatActivity() {
 
