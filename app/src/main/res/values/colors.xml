@@ -2,4 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="brand_background">#F4F6FB</color>
+    <color name="brand_primary">#1F316F</color>
+    <color name="brand_secondary">#5163A6</color>
+    <color name="brand_accent_scan">#E2F1FF</color>
+    <color name="brand_accent_summarize">#EFE9FF</color>
+    <color name="brand_accent_translate">#E2F8EE</color>
+    <color name="brand_badge_background">#E7EEF9</color>
+    <color name="brand_card_stroke">#E3E7F0</color>
 </resources>

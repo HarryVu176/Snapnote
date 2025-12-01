@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Snapnote</string>
+
+    <string name="welcome_title">Welcome to Snapnote</string>
+    <string name="welcome_subtitle">Your smart note companion for capturing whiteboards, pages, and ideas.</string>
+    <string name="offline_badge">Offline ready</string>
+    <string name="offline_message">Scan, summarize, and translate even when you are disconnected.</string>
+
+    <string name="feature_scan_title">Scan Whiteboards &amp; Pages</string>
+    <string name="feature_scan_body">Use the camera to capture crisp notes, sketches, or documents anywhere.</string>
+
+    <string name="feature_summarize_title">Summarize with Gemini</string>
+    <string name="feature_summarize_body">Let Gemini highlight the important bits and turn scribbles into readable notes.</string>
+
+    <string name="feature_translate_title">Translate Your Notes</string>
+    <string name="feature_translate_body">Convert captured notes into your preferred language instantly.</string>
+
+    <string name="get_started">Get started</string>
+    <string name="skip_for_now">Skip for now</string>
+    <string name="returning_user">Already a user? Sign in</string>
 </resources>

@@ -7,7 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.harryvu176.snapnote.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class WelcomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
