@@ -36,23 +36,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         _scanState.value = ScanState.Processing
 
         viewModelScope.launch {
-            try {
-                val text = withContext(Dispatchers.IO) {
-                    val inputImage = InputImage.fromBitmap(bitmap, 0)
-                    val result = textRecognizer.process(inputImage).await()
-                    result.text
-                }
-
-                if (text.isBlank()) {
-                    _scanState.value = ScanState.NoTextFound
-                    _recognizedText.value = ""
-                } else {
-                    _recognizedText.value = text
-                    _scanState.value = ScanState.Success(text)
-                }
-            } catch (e: Exception) {
-                _scanState.value = ScanState.Error(e.message ?: "Unknown error")
-            }
+            runTextRecognition { recognizeTextFromBitmap(bitmap) }
         }
     }
 
@@ -61,39 +45,17 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         _scanState.value = ScanState.Processing
 
         viewModelScope.launch {
-            try {
-                val text = withContext(Dispatchers.IO) {
-                    val inputImage = InputImage.fromFilePath(getApplication(), uri)
-                    val result = textRecognizer.process(inputImage).await()
-                    result.text
-                }
-
-                if (text.isBlank()) {
-                    _scanState.value = ScanState.NoTextFound
-                    _recognizedText.value = ""
-                } else {
-                    _recognizedText.value = text
-                    _scanState.value = ScanState.Success(text)
-                }
-            } catch (e: Exception) {
-                _scanState.value = ScanState.Error(e.message ?: "Unknown error")
-            }
+            runTextRecognition { recognizeTextFromUri(uri) }
         }
     }
 
     fun saveNote(folderId: String? = null): Note {
-        val text = _recognizedText.value ?: ""
-        val title = generateTitle(text)
+        val note = createNote(folderId)
 
-        val note = Note(
-            id = UUID.randomUUID().toString(),
-            title = title,
-            content = text,
-            imageUri = currentImageUri,
-            folderId = folderId
-        )
+        viewModelScope.launch {
+            persistNote(note)
+        }
 
-        repository.saveNote(note)
         return note
     }
 
@@ -118,6 +80,56 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     override fun onCleared() {
         super.onCleared()
         textRecognizer.close()
+    }
+
+    private suspend fun runTextRecognition(recognize: suspend () -> String) {
+        try {
+            val text = recognize()
+            handleRecognizedText(text)
+        } catch (e: Exception) {
+            _scanState.value = ScanState.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    private suspend fun recognizeTextFromBitmap(bitmap: Bitmap): String {
+        val inputImage = InputImage.fromBitmap(bitmap, 0)
+        val result = textRecognizer.process(inputImage).await()
+        return result.text
+    }
+
+    private suspend fun recognizeTextFromUri(uri: Uri): String {
+        val inputImage = InputImage.fromFilePath(getApplication(), uri)
+        val result = textRecognizer.process(inputImage).await()
+        return result.text
+    }
+
+    private fun handleRecognizedText(text: String) {
+        if (text.isBlank()) {
+            _scanState.value = ScanState.NoTextFound
+            _recognizedText.value = ""
+        } else {
+            _recognizedText.value = text
+            _scanState.value = ScanState.Success(text)
+        }
+    }
+
+    private fun createNote(folderId: String?): Note {
+        val text = _recognizedText.value ?: ""
+        val title = generateTitle(text)
+
+        return Note(
+            id = UUID.randomUUID().toString(),
+            title = title,
+            content = text,
+            imageUri = currentImageUri,
+            folderId = folderId
+        )
+    }
+
+    private suspend fun persistNote(note: Note) {
+        withContext(Dispatchers.IO) {
+            repository.saveNote(note)
+        }
     }
 
     sealed class ScanState {
