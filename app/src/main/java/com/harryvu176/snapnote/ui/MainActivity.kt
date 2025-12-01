@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             updateSelectedButton(Tab.NOTES)
         } else {
             // Restore current tab
-            currentTab = Tab.values()[savedInstanceState.getInt(KEY_CURRENT_TAB, 0)]
+            currentTab = Tab.entries.toTypedArray()[savedInstanceState.getInt(KEY_CURRENT_TAB, 0)]
             updateSelectedButton(currentTab)
         }
     }

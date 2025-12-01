@@ -15,7 +15,7 @@ class CreateFolderDialog(
     private val binding get() = _binding!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogCreateFolderBinding.inflate(LayoutInflater.from(context))
+        _binding = DialogCreateFolderBinding.inflate(layoutInflater)
 
         binding.cancelButton.setOnClickListener {
             dismiss()

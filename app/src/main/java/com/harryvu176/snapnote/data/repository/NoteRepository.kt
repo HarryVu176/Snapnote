@@ -6,6 +6,7 @@ import com.harryvu176.snapnote.data.model.Folder
 import com.harryvu176.snapnote.data.model.Note
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.core.content.edit
 
 class NoteRepository(context: Context) {
 
@@ -84,7 +85,7 @@ class NoteRepository(context: Context) {
                 put("updatedAt", note.updatedAt)
             })
         }
-        prefs.edit().putString(KEY_NOTES, jsonArray.toString()).apply()
+        prefs.edit { putString(KEY_NOTES, jsonArray.toString()) }
     }
 
     private fun saveFolders(folders: List<Folder>) {
@@ -96,7 +97,7 @@ class NoteRepository(context: Context) {
                 put("createdAt", folder.createdAt)
             })
         }
-        prefs.edit().putString(KEY_FOLDERS, jsonArray.toString()).apply()
+        prefs.edit { putString(KEY_FOLDERS, jsonArray.toString()) }
     }
 
     private fun parseNotes(json: String): List<Note> {
@@ -108,8 +109,8 @@ class NoteRepository(context: Context) {
                 id = obj.getString("id"),
                 title = obj.getString("title"),
                 content = obj.getString("content"),
-                imageUri = obj.optString("imageUri", null),
-                folderId = obj.optString("folderId", null),
+                imageUri = obj.optString("imageUri", ""),
+                folderId = obj.optString("folderId", ""),
                 createdAt = obj.getLong("createdAt"),
                 updatedAt = obj.getLong("updatedAt")
             ))

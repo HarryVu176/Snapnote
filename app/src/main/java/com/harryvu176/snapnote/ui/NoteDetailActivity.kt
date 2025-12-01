@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import com.harryvu176.snapnote.R
 import com.harryvu176.snapnote.databinding.ActivityNoteDetailBinding
 import com.harryvu176.snapnote.viewmodel.NoteDetailViewModel
+import androidx.core.net.toUri
 
 class NoteDetailActivity : AppCompatActivity() {
 
@@ -74,7 +75,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 // Load image if available
                 if (!it.imageUri.isNullOrEmpty()) {
                     try {
-                        binding.originalImageView.setImageURI(Uri.parse(it.imageUri))
+                        binding.originalImageView.setImageURI(it.imageUri.toUri())
                         binding.toggleImageButton.isVisible = true
                     } catch (e: Exception) {
                         binding.toggleImageButton.isVisible = false

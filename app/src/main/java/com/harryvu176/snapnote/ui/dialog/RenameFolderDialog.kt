@@ -16,7 +16,7 @@ class RenameFolderDialog(
     private val binding get() = _binding!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogRenameFolderBinding.inflate(LayoutInflater.from(context))
+        _binding = DialogRenameFolderBinding.inflate(layoutInflater)
 
         binding.folderNameInput.setText(currentName)
         binding.folderNameInput.selectAll()

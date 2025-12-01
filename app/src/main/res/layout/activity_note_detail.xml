@@ -164,7 +164,7 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Action Bar (same style as navigation bar) -->
+    <!-- Bottom Action Bar -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottomActionCard"
         android:layout_width="0dp"

@@ -16,7 +16,7 @@ class RenameNoteDialog(
     private val binding get() = _binding!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogRenameNoteBinding.inflate(LayoutInflater.from(context))
+        _binding = DialogRenameNoteBinding.inflate(layoutInflater)
 
         binding.noteTitleInput.setText(currentTitle)
         binding.noteTitleInput.selectAll()
