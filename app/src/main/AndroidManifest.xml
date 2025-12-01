@@ -15,13 +15,13 @@
             android:name=".NoteDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".NotesActivity"
+            android:name=".FoldersActivity"
             android:exported="false" />
         <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
         <activity
-            android:name=".FoldersActivity"
+            android:name=".NotesActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
