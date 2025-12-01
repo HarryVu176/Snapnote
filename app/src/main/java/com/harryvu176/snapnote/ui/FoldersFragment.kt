@@ -144,8 +144,13 @@ class FoldersFragment : Fragment() {
     }
 
     private fun navigateToUnsortedNotes() {
-        // TODO: Navigate to unsorted notes view
-        // For now, we can show notes fragment filtered by unsorted
+        val fragment = FolderDetailFragment.newInstanceForUnsorted(
+            getString(R.string.unsorted_notes)
+        )
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {

@@ -113,8 +113,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFragment(fragment: Fragment, clearBackStack: Boolean = false) {
         if (clearBackStack) {
-            // Clear back stack when switching tabs
-            supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            // Clear back stack synchronously when switching tabs so the nav state
+            // doesn't get reset by the back stack listener afterwards.
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                supportFragmentManager.popBackStackImmediate(
+                    null,
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE
+                )
+            }
         }
 
         supportFragmentManager.beginTransaction()

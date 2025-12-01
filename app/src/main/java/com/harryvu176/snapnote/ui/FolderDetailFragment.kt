@@ -28,12 +28,14 @@ class FolderDetailFragment : Fragment() {
 
     private var folderId: String? = null
     private var folderName: String? = null
+    private var isUnsorted: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             folderId = it.getString(ARG_FOLDER_ID)
             folderName = it.getString(ARG_FOLDER_NAME)
+            isUnsorted = it.getBoolean(ARG_IS_UNSORTED, false)
         }
     }
 
@@ -55,12 +57,12 @@ class FolderDetailFragment : Fragment() {
         setupClickListeners()
         observeViewModel()
 
-        folderId?.let { viewModel.loadNotesForFolder(it) }
+        viewModel.loadNotesForFolder(folderId)
     }
 
     override fun onResume() {
         super.onResume()
-        folderId?.let { viewModel.loadNotesForFolder(it) }
+        viewModel.loadNotesForFolder(folderId)
     }
 
     private fun setupRecyclerView() {
@@ -80,8 +82,12 @@ class FolderDetailFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
 
-        binding.editButton.setOnClickListener {
-            showRenameDialog()
+        if (isUnsorted) {
+            binding.editButton.visibility = View.GONE
+        } else {
+            binding.editButton.setOnClickListener {
+                showRenameDialog()
+            }
         }
 
         binding.scanNoteFab.setOnClickListener {
@@ -105,9 +111,11 @@ class FolderDetailFragment : Fragment() {
             }
         }
 
-        viewModel.folderName.observe(viewLifecycleOwner) { name ->
-            binding.folderTitle.text = name
-            folderName = name
+        if (!isUnsorted) {
+            viewModel.folderName.observe(viewLifecycleOwner) { name ->
+                binding.folderTitle.text = name
+                folderName = name
+            }
         }
     }
 
@@ -166,12 +174,26 @@ class FolderDetailFragment : Fragment() {
     companion object {
         private const val ARG_FOLDER_ID = "folder_id"
         private const val ARG_FOLDER_NAME = "folder_name"
+        private const val ARG_IS_UNSORTED = "is_unsorted"
 
         fun newInstance(folderId: String, folderName: String): FolderDetailFragment {
+            return createInstance(folderId, folderName, false)
+        }
+
+        fun newInstanceForUnsorted(folderName: String): FolderDetailFragment {
+            return createInstance(null, folderName, true)
+        }
+
+        private fun createInstance(
+            folderId: String?,
+            folderName: String,
+            isUnsorted: Boolean
+        ): FolderDetailFragment {
             return FolderDetailFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_FOLDER_ID, folderId)
                     putString(ARG_FOLDER_NAME, folderName)
+                    putBoolean(ARG_IS_UNSORTED, isUnsorted)
                 }
             }
         }

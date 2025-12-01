@@ -4,9 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.harryvu176.snapnote.data.model.Folder
 import com.harryvu176.snapnote.data.repository.NoteRepository
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FoldersViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -23,8 +27,15 @@ class FoldersViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun loadFolders() {
-        _folders.value = repository.getAllFolders()
-        _unsortedNotesCount.value = repository.getUnsortedNotes().size
+        viewModelScope.launch {
+            val (foldersResult, unsortedCount) = withContext(Dispatchers.IO) {
+                val foldersList = repository.getAllFolders()
+                val unsorted = repository.getUnsortedNotes().size
+                foldersList to unsorted
+            }
+            _folders.value = foldersResult
+            _unsortedNotesCount.value = unsortedCount
+        }
     }
 
     fun createFolder(name: String) {
