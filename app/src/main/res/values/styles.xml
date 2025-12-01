@@ -1,0 +1,7 @@
+<resources>
+    <style name="Widget.Snapnote.BottomNav.ActiveIndicator" parent="@style/Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Full</item>
+    </style>
+
+
+</resources>

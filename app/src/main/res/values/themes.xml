@@ -3,6 +3,17 @@
     <style name="Base.Theme.Snapnote" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:fontFamily">@font/momotrustsans_vf_wght</item>
+
+        <!-- Global font for Material Components -->
+        <item name="fontFamily">@font/momotrustsans_vf_wght</item>
+
+        <!-- Make every TextView use it by default -->
+        <item name="android:textViewStyle">@style/App.TextView</item>
+    </style>
+
+    <style name="App.TextView" parent="@android:style/Widget.TextView">
+        <item name="android:fontFamily">@font/momotrustsans_vf_wght</item>
     </style>
 
     <style name="Theme.Snapnote" parent="Base.Theme.Snapnote" />

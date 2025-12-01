@@ -18,4 +18,37 @@
     <string name="get_started">Get started</string>
     <string name="skip_for_now">Skip for now</string>
     <string name="returning_user">Already a user? Sign in</string>
+
+    <string name="notes_screen_title">Notes</string>
+    <string name="search_notes_hint">Search notes by title or content</string>
+    <string name="scan_new_note">Scan new note</string>
+    <string name="nav_notes">Notes</string>
+    <string name="nav_folders">Folders</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Note Detail Screen -->
+    <string name="back">Back</string>
+    <string name="edit_note">Edit note</string>
+    <string name="save">Save</string>
+    <string name="show_original_image">Show original image</string>
+    <string name="hide_original_image">Hide original image</string>
+    <string name="original_image">Original image</string>
+    <string name="recognized_text">Recognized Text</string>
+    <string name="note_content_hint">Note content</string>
+    <string name="summarize">Summarize</string>
+    <string name="translate">Translate</string>
+
+    <!-- Folders Screen -->
+    <string name="folders_screen_title">Folders</string>
+    <string name="unsorted_notes">Unsorted Notes</string>
+    <string name="my_folders">My Folders</string>
+    <string name="create_new_folder">Create new folder</string>
+    <string name="open_folder">Open folder</string>
+    <string name="no_folders">No folders yet</string>
+    <string name="no_folders_description">Create folders to organize your notes by subject, project, or any way you like.</string>
+    <string name="notes_count">%d notes</string>
+    <string name="one_note">1 note</string>
+    <string name="folder_options">Folder options</string>
+    <string name="rename_folder">Rename folder</string>
+    <string name="delete_folder">Delete folder</string>
 </resources>

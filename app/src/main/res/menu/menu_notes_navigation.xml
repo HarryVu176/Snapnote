@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_notes"
+        android:checked="true"
+        android:icon="@drawable/ic_nav_notes"
+        android:title="@string/nav_notes" />
+    <item
+        android:id="@+id/navigation_folders"
+        android:icon="@drawable/ic_nav_folders"
+        android:title="@string/nav_folders" />
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="@string/nav_settings" />
+</menu>
