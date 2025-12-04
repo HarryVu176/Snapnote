@@ -102,8 +102,6 @@ class NoteDetailActivity : AppCompatActivity() {
         }
 
         viewModel.isEditMode.observe(this) { isEditMode ->
-            // Instead of disabling the view (which greys out text), we just make it non-focusable/read-only
-            // This ensures high contrast text at all times.
             with(binding.noteContentEditText) {
                 isFocusable = isEditMode
                 isFocusableInTouchMode = isEditMode
@@ -136,7 +134,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 binding.translationProgressBar.isVisible = false
                 binding.translateButton.isEnabled = true
                 
-                // If translation exists, show it (handled by note observer usually, but double check here)
+                // If translation exists, show
                 val currentNote = viewModel.note.value
                 if (currentNote?.translation != null) {
                     binding.translatedContentLayout.isVisible = true
