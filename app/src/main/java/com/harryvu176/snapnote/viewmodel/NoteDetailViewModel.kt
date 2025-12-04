@@ -28,7 +28,6 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
     private val _saveSuccess = MutableLiveData<Boolean>()
     val saveSuccess: LiveData<Boolean> = _saveSuccess
 
-    // Replaced Sealed Class with simple LiveData variables
     private val _isTranslating = MutableLiveData(false)
     val isTranslating: LiveData<Boolean> = _isTranslating
 
@@ -82,21 +81,21 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
 
         _isTranslating.value = true
-        _translationError.value = null // Clear previous errors
+        _translationError.value = null
 
-        // First, identify the language
+        // Identify language
         val languageIdentifier = LanguageIdentification.getClient()
         languageIdentifier.identifyLanguage(content)
             .addOnSuccessListener { languageCode ->
                 if (languageCode == "und") {
-                     // Fallback to English if undetermined
+                     // Fallback to English
                     performTranslation(currentNote, content, TranslateLanguage.ENGLISH)
                 } else {
                     performTranslation(currentNote, content, languageCode)
                 }
             }
             .addOnFailureListener {
-                // Fallback to English if identification fails
+                // Fallback to English
                 performTranslation(currentNote, content, TranslateLanguage.ENGLISH)
             }
     }
@@ -104,7 +103,6 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
     private fun performTranslation(currentNote: Note, content: String, sourceLang: String) {
         viewModelScope.launch {
             try {
-                // Map detected language to target.
                 val targetLang = if (sourceLang == TranslateLanguage.ENGLISH) {
                     TranslateLanguage.FRENCH
                 } else {
@@ -122,7 +120,7 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
                 // Download model if needed
                 translator.downloadModelIfNeeded(conditions).await()
 
-                // Split content by newlines to preserve formatting (lists, bullets)
+                // Split content by newlines to preserve formatting
                 val lines = content.split("\n")
                 val translatedLines = lines.map { line ->
                     if (line.isBlank()) ""
