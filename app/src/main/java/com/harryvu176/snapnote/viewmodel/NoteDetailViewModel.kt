@@ -6,7 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
 import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import com.harryvu176.snapnote.data.model.Note
@@ -83,19 +85,16 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
         _isTranslating.value = true
         _translationError.value = null
 
-        // Identify language
         val languageIdentifier = LanguageIdentification.getClient()
         languageIdentifier.identifyLanguage(content)
             .addOnSuccessListener { languageCode ->
                 if (languageCode == "und") {
-                     // Fallback to English
                     performTranslation(currentNote, content, TranslateLanguage.ENGLISH)
                 } else {
                     performTranslation(currentNote, content, languageCode)
                 }
             }
             .addOnFailureListener {
-                // Fallback to English
                 performTranslation(currentNote, content, TranslateLanguage.ENGLISH)
             }
     }
@@ -117,10 +116,8 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
                 val translator = Translation.getClient(options)
                 val conditions = DownloadConditions.Builder().build()
 
-                // Download model if needed
                 translator.downloadModelIfNeeded(conditions).await()
 
-                // Split content by newlines to preserve formatting
                 val lines = content.split("\n")
                 val translatedLines = lines.map { line ->
                     if (line.isBlank()) ""

@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
             preloadTestData()
         }
 
-        // Start downloading translation models in the background
         prefetchTranslationModels()
 
         if (savedInstanceState == null) {
@@ -56,7 +55,6 @@ class MainActivity : AppCompatActivity() {
             currentTab = Tab.NOTES
             updateSelectedButton(Tab.NOTES)
         } else {
-            // Restore current tab
             currentTab = Tab.entries.toTypedArray()[savedInstanceState.getInt(KEY_CURRENT_TAB, 0)]
             updateSelectedButton(currentTab)
         }
@@ -68,16 +66,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun prefetchTranslationModels() {
-        // List of languages to pre-fetch
         val languages = listOf(
-            TranslateLanguage.FRENCH,
-            TranslateLanguage.GERMAN,
-            TranslateLanguage.SPANISH
+            TranslateLanguage.FRENCH
         )
 
         val modelManager = RemoteModelManager.getInstance()
         
-        // Configure download conditions
         val conditions = DownloadConditions.Builder()
             .build()
 
@@ -141,8 +135,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBackStackListener() {
         supportFragmentManager.addOnBackStackChangedListener {
-            // When back stack is empty, we're at the root fragment
-            // Update selected button based on current fragment
             val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
             when (currentFragment) {
                 is NotesFragment -> {
@@ -163,13 +155,11 @@ class MainActivity : AppCompatActivity() {
                 if (supportFragmentManager.backStackEntryCount > 0) {
                     supportFragmentManager.popBackStack()
                 } else {
-                    // If we're on a different tab, go to Notes first
                     if (currentTab != Tab.NOTES) {
                         loadFragment(NotesFragment(), clearBackStack = true)
                         currentTab = Tab.NOTES
                         updateSelectedButton(Tab.NOTES)
                     } else {
-                        // Exit the app
                         isEnabled = false
                         onBackPressedDispatcher.onBackPressed()
                     }
@@ -180,8 +170,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFragment(fragment: Fragment, clearBackStack: Boolean = false) {
         if (clearBackStack) {
-            // Clear back stack synchronously when switching tabs so the nav state
-            // doesn't get reset by the back stack listener afterwards.
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStackImmediate(
                     null,

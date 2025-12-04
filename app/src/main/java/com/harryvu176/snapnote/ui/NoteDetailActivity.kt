@@ -9,9 +9,14 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.harryvu176.snapnote.R
 import com.harryvu176.snapnote.databinding.ActivityNoteDetailBinding
 import com.harryvu176.snapnote.viewmodel.NoteDetailViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class NoteDetailActivity : AppCompatActivity() {
 
@@ -19,6 +24,7 @@ class NoteDetailActivity : AppCompatActivity() {
     private val viewModel: NoteDetailViewModel by viewModels()
 
     private var isImageVisible = false
+    private var thinkingJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,7 +112,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 isFocusable = isEditMode
                 isFocusableInTouchMode = isEditMode
                 isCursorVisible = isEditMode
-                isLongClickable = isEditMode 
+                isLongClickable = isEditMode
                 
                 if (isEditMode) {
                     requestFocus()
@@ -127,10 +133,11 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.isTranslating.observe(this) { isTranslating ->
             if (isTranslating) {
                 binding.translatedContentLayout.isVisible = true
-                binding.translationTextView.text = getString(R.string.translating)
                 binding.translationProgressBar.isVisible = true
                 binding.translateButton.isEnabled = false
+                startThinkingAnimation()
             } else {
+                stopThinkingAnimation()
                 binding.translationProgressBar.isVisible = false
                 binding.translateButton.isEnabled = true
                 
@@ -150,6 +157,25 @@ class NoteDetailActivity : AppCompatActivity() {
                 Toast.makeText(this, "${getString(R.string.translation_error)}: $it", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun startThinkingAnimation() {
+        thinkingJob?.cancel()
+        thinkingJob = lifecycleScope.launch {
+            var dots = 1
+            while (isActive) {
+                val dotString = ".".repeat(dots)
+                binding.translationTextView.text = "Thinking$dotString"
+                delay(500) // Update every 500ms
+                dots++
+                if (dots > 3) dots = 1
+            }
+        }
+    }
+
+    private fun stopThinkingAnimation() {
+        thinkingJob?.cancel()
+        thinkingJob = null
     }
 
     private fun toggleImageVisibility() {
