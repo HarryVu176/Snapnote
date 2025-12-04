@@ -2,6 +2,7 @@ package com.harryvu176.snapnote.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -9,8 +10,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.common.model.RemoteModelManager
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.TranslateRemoteModel
+import com.harryvu176.snapnote.BuildConfig
 import com.harryvu176.snapnote.R
+import com.harryvu176.snapnote.data.model.Note
+import com.harryvu176.snapnote.data.repository.NoteRepository
 import com.harryvu176.snapnote.databinding.ActivityMainBinding
+import org.json.JSONArray
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +44,13 @@ class MainActivity : AppCompatActivity() {
         setupBackStackListener()
         setupBackPressedCallback()
 
+        if (BuildConfig.DEBUG) {
+            preloadTestData()
+        }
+
+        // Start downloading translation models in the background
+        prefetchTranslationModels()
+
         if (savedInstanceState == null) {
             loadFragment(NotesFragment(), clearBackStack = true)
             currentTab = Tab.NOTES
@@ -48,6 +65,56 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(KEY_CURRENT_TAB, currentTab.ordinal)
+    }
+
+    private fun prefetchTranslationModels() {
+        // List of languages to pre-fetch
+        val languages = listOf(
+            TranslateLanguage.FRENCH,
+            TranslateLanguage.GERMAN,
+            TranslateLanguage.SPANISH
+        )
+
+        val modelManager = RemoteModelManager.getInstance()
+        
+        // Configure download conditions
+        val conditions = DownloadConditions.Builder()
+            .build()
+
+        languages.forEach { language ->
+            val model = TranslateRemoteModel.Builder(language).build()
+            modelManager.download(model, conditions)
+                .addOnSuccessListener {
+                   Toast.makeText(this, "Pre-fetched model: $language", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Failed to pre-fetch model: $language", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun preloadTestData() {
+        val repository = NoteRepository(this)
+        if (repository.getAllNotes().isNotEmpty()) return
+
+        try {
+            val jsonString = assets.open("sample_notes.json").bufferedReader().use { it.readText() }
+            val jsonArray = JSONArray(jsonString)
+
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                val note = Note(
+                    id = UUID.randomUUID().toString(),
+                    title = obj.getString("title"),
+                    content = obj.getString("content"),
+                    translation = null,
+                    folderId = null
+                )
+                repository.saveNote(note)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun setupNavigation() {
