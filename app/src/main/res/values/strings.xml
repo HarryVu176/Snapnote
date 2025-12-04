@@ -35,7 +35,7 @@
     <string name="original_image">Original image</string>
     <string name="recognized_text">Recognized Text</string>
     <string name="note_content_hint">Note content</string>
-    <string name="summarize">Summarize</string>
+
     <string name="translate">Translate</string>
     <string name="translated_content_label">Translated Content</string>
     <string name="translating">Translating…</string>

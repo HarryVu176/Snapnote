@@ -159,7 +159,11 @@
                             android:id="@+id/translationTextView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:maxLines="15"
+                            android:scrollbars="vertical"
+                            android:textIsSelectable="true"
+                            android:lineSpacingExtra="4dp"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
                             tools:text="This is the translated text." />
 
                         <ProgressBar
@@ -205,6 +209,8 @@
                     android:inputType="textMultiLine"
                     android:lineSpacingExtra="4dp"
                     android:minLines="10"
+                    android:scrollbars="vertical"
+                    android:textColor="?attr/colorOnSurface"
                     android:textAppearance="?attr/textAppearanceBodyLarge"
                     tools:text="This is the recognized text from the scanned image. It can be quite long and will be scrollable. The user can tap the Edit button to modify this text.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." />
 
@@ -234,19 +240,6 @@
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingVertical="8dp">
-
-            <!-- Summarize Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/summarizeButton"
-                style="@style/Widget.Material3.Button.TextButton.Icon"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_weight="1"
-                android:text="@string/summarize"
-                app:icon="@drawable/ic_summarize"
-                app:iconGravity="top"
-                app:iconSize="24dp" />
 
             <!-- Translate Button -->
             <com.google.android.material.button.MaterialButton

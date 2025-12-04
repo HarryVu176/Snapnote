@@ -4,19 +4,16 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import com.harryvu176.snapnote.data.model.Note
 import com.harryvu176.snapnote.data.repository.NoteRepository
-
-sealed class TranslationState {
-    object Idle : TranslationState()
-    object Loading : TranslationState()
-    data class Success(val translation: String) : TranslationState()
-    data class Error(val message: String) : TranslationState()
-}
+import com.google.mlkit.nl.languageid.LanguageIdentification
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class NoteDetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -31,8 +28,12 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
     private val _saveSuccess = MutableLiveData<Boolean>()
     val saveSuccess: LiveData<Boolean> = _saveSuccess
 
-    private val _translationState = MutableLiveData<TranslationState>(TranslationState.Idle)
-    val translationState: LiveData<TranslationState> = _translationState
+    // Replaced Sealed Class with simple LiveData variables
+    private val _isTranslating = MutableLiveData(false)
+    val isTranslating: LiveData<Boolean> = _isTranslating
+
+    private val _translationError = MutableLiveData<String?>()
+    val translationError: LiveData<String?> = _translationError
 
     fun loadNote(noteId: String) {
         _note.value = repository.getAllNotes().find { it.id == noteId }
@@ -76,48 +77,74 @@ class NoteDetailViewModel(application: Application) : AndroidViewModel(applicati
         val content = currentNote.content
 
         if (content.isBlank()) {
-            _translationState.value = TranslationState.Error("Note content is empty")
+            _translationError.value = "Note content is empty"
             return
         }
 
-        _translationState.value = TranslationState.Loading
+        _isTranslating.value = true
+        _translationError.value = null // Clear previous errors
 
-        // Configure translation: Auto-detect (or assume English for now) to French (or preferred language)
-        // For simplicity, let's translate from English to French. 
-        // In a real app, you might detect language or let user pick.
-        val options = TranslatorOptions.Builder()
-            .setSourceLanguage(TranslateLanguage.ENGLISH)
-            .setTargetLanguage(TranslateLanguage.FRENCH)
-            .build()
-            
-        val translator = Translation.getClient(options)
-
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-
-        // Ensure model is downloaded before translating
-        translator.downloadModelIfNeeded(conditions)
-            .addOnSuccessListener {
-                translator.translate(content)
-                    .addOnSuccessListener { translatedText ->
-                        val updatedNote = currentNote.copy(
-                            translation = translatedText,
-                            updatedAt = System.currentTimeMillis()
-                        )
-                        repository.saveNote(updatedNote)
-                        _note.value = updatedNote
-                        _translationState.value = TranslationState.Success(translatedText)
-                        translator.close()
-                    }
-                    .addOnFailureListener { e ->
-                        _translationState.value = TranslationState.Error("Translation failed: ${e.localizedMessage}")
-                        translator.close()
-                    }
+        // First, identify the language
+        val languageIdentifier = LanguageIdentification.getClient()
+        languageIdentifier.identifyLanguage(content)
+            .addOnSuccessListener { languageCode ->
+                if (languageCode == "und") {
+                     // Fallback to English if undetermined
+                    performTranslation(currentNote, content, TranslateLanguage.ENGLISH)
+                } else {
+                    performTranslation(currentNote, content, languageCode)
+                }
             }
-            .addOnFailureListener { e ->
-                _translationState.value = TranslationState.Error("Model download failed: ${e.localizedMessage}")
+            .addOnFailureListener {
+                // Fallback to English if identification fails
+                performTranslation(currentNote, content, TranslateLanguage.ENGLISH)
+            }
+    }
+
+    private fun performTranslation(currentNote: Note, content: String, sourceLang: String) {
+        viewModelScope.launch {
+            try {
+                // Map detected language to target.
+                val targetLang = if (sourceLang == TranslateLanguage.ENGLISH) {
+                    TranslateLanguage.FRENCH
+                } else {
+                    TranslateLanguage.ENGLISH
+                }
+
+                val options = TranslatorOptions.Builder()
+                    .setSourceLanguage(sourceLang)
+                    .setTargetLanguage(targetLang)
+                    .build()
+
+                val translator = Translation.getClient(options)
+                val conditions = DownloadConditions.Builder().build()
+
+                // Download model if needed
+                translator.downloadModelIfNeeded(conditions).await()
+
+                // Split content by newlines to preserve formatting (lists, bullets)
+                val lines = content.split("\n")
+                val translatedLines = lines.map { line ->
+                    if (line.isBlank()) ""
+                    else translator.translate(line).await()
+                }
+                
+                val finalTranslation = translatedLines.joinToString("\n")
+
+                val updatedNote = currentNote.copy(
+                    translation = finalTranslation,
+                    updatedAt = System.currentTimeMillis()
+                )
+                repository.saveNote(updatedNote)
+                _note.value = updatedNote
+                
+                _isTranslating.value = false
                 translator.close()
+
+            } catch (e: Exception) {
+                _isTranslating.value = false
+                _translationError.value = "Translation failed: ${e.localizedMessage}"
             }
+        }
     }
 }

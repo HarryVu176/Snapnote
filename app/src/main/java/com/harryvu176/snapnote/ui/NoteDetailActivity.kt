@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import com.harryvu176.snapnote.R
 import com.harryvu176.snapnote.databinding.ActivityNoteDetailBinding
 import com.harryvu176.snapnote.viewmodel.NoteDetailViewModel
-import com.harryvu176.snapnote.viewmodel.TranslationState
 
 class NoteDetailActivity : AppCompatActivity() {
 
@@ -94,7 +93,8 @@ class NoteDetailActivity : AppCompatActivity() {
                     binding.translationTextView.text = it.translation
                     binding.translationProgressBar.isVisible = false
                 } else {
-                    if (viewModel.translationState.value !is TranslationState.Loading) {
+                    // Only hide if NOT currently translating
+                    if (viewModel.isTranslating.value != true) {
                         binding.translatedContentLayout.isVisible = false
                     }
                 }
@@ -102,13 +102,22 @@ class NoteDetailActivity : AppCompatActivity() {
         }
 
         viewModel.isEditMode.observe(this) { isEditMode ->
-            binding.noteContentEditText.isEnabled = isEditMode
+            // Instead of disabling the view (which greys out text), we just make it non-focusable/read-only
+            // This ensures high contrast text at all times.
+            with(binding.noteContentEditText) {
+                isFocusable = isEditMode
+                isFocusableInTouchMode = isEditMode
+                isCursorVisible = isEditMode
+                isLongClickable = isEditMode 
+                
+                if (isEditMode) {
+                    requestFocus()
+                    setSelection(text?.length ?: 0)
+                }
+            }
+
             binding.editButton.isVisible = !isEditMode
             binding.saveButton.isVisible = isEditMode
-
-            if (isEditMode) {
-                binding.noteContentEditText.requestFocus()
-            }
         }
 
         viewModel.saveSuccess.observe(this) { success ->
@@ -117,38 +126,30 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.translationState.observe(this) { state ->
-            when (state) {
-                is TranslationState.Idle -> {
-                    // Do nothing
-                }
-                is TranslationState.Loading -> {
+        viewModel.isTranslating.observe(this) { isTranslating ->
+            if (isTranslating) {
+                binding.translatedContentLayout.isVisible = true
+                binding.translationTextView.text = getString(R.string.translating)
+                binding.translationProgressBar.isVisible = true
+                binding.translateButton.isEnabled = false
+            } else {
+                binding.translationProgressBar.isVisible = false
+                binding.translateButton.isEnabled = true
+                
+                // If translation exists, show it (handled by note observer usually, but double check here)
+                val currentNote = viewModel.note.value
+                if (currentNote?.translation != null) {
                     binding.translatedContentLayout.isVisible = true
-                    binding.translationTextView.text = getString(R.string.translating)
-                    binding.translationProgressBar.isVisible = true
-                    binding.translateButton.isEnabled = false
+                    binding.translationTextView.text = currentNote.translation
+                } else {
+                    binding.translatedContentLayout.isVisible = false
                 }
-                is TranslationState.Success -> {
-                    binding.translatedContentLayout.isVisible = true
-                    binding.translationTextView.text = state.translation
-                    binding.translationProgressBar.isVisible = false
-                    binding.translateButton.isEnabled = true
-                    Toast.makeText(this, R.string.translation_success, Toast.LENGTH_SHORT).show()
-                }
-                is TranslationState.Error -> {
-                    binding.translationProgressBar.isVisible = false
-                    binding.translateButton.isEnabled = true
-                    
-                    val currentNote = viewModel.note.value
-                    if (!currentNote?.translation.isNullOrEmpty()) {
-                        binding.translatedContentLayout.isVisible = true
-                        binding.translationTextView.text = currentNote?.translation
-                    } else {
-                        binding.translatedContentLayout.isVisible = false
-                    }
+            }
+        }
 
-                    Toast.makeText(this, "${getString(R.string.translation_error)}: ${state.message}", Toast.LENGTH_LONG).show()
-                }
+        viewModel.translationError.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, "${getString(R.string.translation_error)}: $it", Toast.LENGTH_LONG).show()
             }
         }
     }
