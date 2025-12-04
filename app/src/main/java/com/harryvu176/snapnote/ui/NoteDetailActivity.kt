@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import com.harryvu176.snapnote.R
 import com.harryvu176.snapnote.databinding.ActivityNoteDetailBinding
 import com.harryvu176.snapnote.viewmodel.NoteDetailViewModel
+import com.harryvu176.snapnote.viewmodel.TranslationState
 
 class NoteDetailActivity : AppCompatActivity() {
 
@@ -63,6 +64,10 @@ class NoteDetailActivity : AppCompatActivity() {
         binding.toggleImageButton.setOnClickListener {
             toggleImageVisibility()
         }
+
+        binding.translateButton.setOnClickListener {
+            viewModel.translateNote()
+        }
     }
 
     private fun observeViewModel() {
@@ -82,6 +87,17 @@ class NoteDetailActivity : AppCompatActivity() {
                 } else {
                     binding.toggleImageButton.isVisible = false
                 }
+
+                // Show/hide translation based on its existence
+                if (!it.translation.isNullOrEmpty()) {
+                    binding.translatedContentLayout.isVisible = true
+                    binding.translationTextView.text = it.translation
+                    binding.translationProgressBar.isVisible = false
+                } else {
+                    if (viewModel.translationState.value !is TranslationState.Loading) {
+                        binding.translatedContentLayout.isVisible = false
+                    }
+                }
             }
         }
 
@@ -98,6 +114,41 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.saveSuccess.observe(this) { success ->
             if (success) {
                 Toast.makeText(this, R.string.note_updated, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.translationState.observe(this) { state ->
+            when (state) {
+                is TranslationState.Idle -> {
+                    // Do nothing
+                }
+                is TranslationState.Loading -> {
+                    binding.translatedContentLayout.isVisible = true
+                    binding.translationTextView.text = getString(R.string.translating)
+                    binding.translationProgressBar.isVisible = true
+                    binding.translateButton.isEnabled = false
+                }
+                is TranslationState.Success -> {
+                    binding.translatedContentLayout.isVisible = true
+                    binding.translationTextView.text = state.translation
+                    binding.translationProgressBar.isVisible = false
+                    binding.translateButton.isEnabled = true
+                    Toast.makeText(this, R.string.translation_success, Toast.LENGTH_SHORT).show()
+                }
+                is TranslationState.Error -> {
+                    binding.translationProgressBar.isVisible = false
+                    binding.translateButton.isEnabled = true
+                    
+                    val currentNote = viewModel.note.value
+                    if (!currentNote?.translation.isNullOrEmpty()) {
+                        binding.translatedContentLayout.isVisible = true
+                        binding.translationTextView.text = currentNote?.translation
+                    } else {
+                        binding.translatedContentLayout.isVisible = false
+                    }
+
+                    Toast.makeText(this, "${getString(R.string.translation_error)}: ${state.message}", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

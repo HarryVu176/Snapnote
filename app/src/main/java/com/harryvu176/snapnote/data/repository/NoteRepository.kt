@@ -81,6 +81,7 @@ class NoteRepository(context: Context) {
                 put("content", note.content)
                 put("imageUri", note.imageUri)
                 put("folderId", note.folderId)
+                put("translation", note.translation)
                 put("createdAt", note.createdAt)
                 put("updatedAt", note.updatedAt)
             })
@@ -111,6 +112,7 @@ class NoteRepository(context: Context) {
                 content = obj.getString("content"),
                 imageUri = obj.optString("imageUri", null),
                 folderId = obj.optString("folderId", null),
+                translation = obj.optString("translation", null),
                 createdAt = obj.getLong("createdAt"),
                 updatedAt = obj.getLong("updatedAt")
             ))
