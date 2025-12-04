@@ -166,7 +166,7 @@ class NoteDetailActivity : AppCompatActivity() {
             while (isActive) {
                 val dotString = ".".repeat(dots)
                 binding.translationTextView.text = "Thinking$dotString"
-                delay(500) // Update every 500ms
+                delay(500)
                 dots++
                 if (dots > 3) dots = 1
             }
