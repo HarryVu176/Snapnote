@@ -6,6 +6,7 @@ data class Note(
     val content: String,
     val imageUri: String? = null,
     val folderId: String? = null,
+    val translation: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )

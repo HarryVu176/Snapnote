@@ -37,6 +37,10 @@
     <string name="note_content_hint">Note content</string>
     <string name="summarize">Summarize</string>
     <string name="translate">Translate</string>
+    <string name="translated_content_label">Translated Content</string>
+    <string name="translating">Translating…</string>
+    <string name="translation_error">Failed to translate</string>
+    <string name="translation_success">Translation successful</string>
 
     <!-- Folders Screen -->
     <string name="folders_screen_title">Folders</string>
