@@ -85,4 +85,8 @@
     <string name="note_title_hint">Note title</string>
     <string name="untitled_note">Untitled Note</string>
     <string name="note_updated">Note saved</string>
+    
+    <!-- About -->
+    <string name="created_by">Created by:</string>
+    <string name="group_members">Harry Vu\nJeong-Ah Yoon\nKulvir Hira\nRyan Sweet</string>
 </resources>
