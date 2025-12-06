@@ -44,16 +44,16 @@ class MainActivity : AppCompatActivity() {
         setupBackStackListener()
         setupBackPressedCallback()
 
-        if (BuildConfig.DEBUG) {
-            preloadTestData()
-        }
-
-        prefetchTranslationModels()
-
         if (savedInstanceState == null) {
+            prefetchTranslationModels()
+            
             loadFragment(NotesFragment(), clearBackStack = true)
             currentTab = Tab.NOTES
             updateSelectedButton(Tab.NOTES)
+
+            if (BuildConfig.DEBUG) {
+                preloadTestData()
+            }
         } else {
             currentTab = Tab.entries.toTypedArray()[savedInstanceState.getInt(KEY_CURRENT_TAB, 0)]
             updateSelectedButton(currentTab)
